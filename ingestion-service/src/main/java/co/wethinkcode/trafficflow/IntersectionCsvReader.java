@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class IntersectionCsvReader {
 
@@ -13,6 +15,10 @@ public class IntersectionCsvReader {
 
     public List<Intersection> readIntersections() {
         List<Intersection> intersections = new ArrayList<>();
+
+        // Keeps track of intersection IDs that have already been processed.
+        // This helps prevent duplicate intersections from being added.
+        Set<String> seenIds = new HashSet<>();
 
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("intersections-legacy.csv");
 
@@ -39,9 +45,18 @@ public class IntersectionCsvReader {
                 String signalType = cleaner.cleanSignalType(values[2]);
                 Boolean active = cleaner.cleanActiveFlag(values[3]);
 
+                // Skip intersections that have already been processed
+                if (id != null && seenIds.contains(id)) {
+                    continue;
+                }
+
                 Intersection intersection = new Intersection(id, district, signalType, active);
 
                 intersections.add(intersection);
+
+                if (id != null) {
+                    seenIds.add(id);
+                }
             }
 
         } catch (IOException e) {

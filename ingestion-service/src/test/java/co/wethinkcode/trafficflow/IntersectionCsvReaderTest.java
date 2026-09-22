@@ -31,4 +31,17 @@ public class IntersectionCsvReaderTest {
         assertEquals("4-way", firstIntersection.getSignalType());
         assertTrue(firstIntersection.getActive());
     }
+
+    @Test
+    void shouldRemoveDuplicateIntersectionIds() {
+        IntersectionCsvReader reader = new IntersectionCsvReader();
+
+        List<Intersection> intersections = reader.readIntersections();
+
+        long count = intersections.stream()
+                .filter(intersection -> intersection.getId().equals("INT-1005"))
+                .count();
+
+        assertEquals(1, count);
+    }
 }
