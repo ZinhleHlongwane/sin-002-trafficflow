@@ -76,4 +76,15 @@ public class IntersectionCsvReaderTest {
 
         assertNull(missingDistrict.getDistrict());
     }
+
+    @Test
+    void shouldTreatPlaceholderValuesAsMissing() {
+        IntersectionCleaner cleaner = new IntersectionCleaner();
+
+        // Common legacy placeholders should be converted to null.
+        assertNull(cleaner.cleanSignalType("N/A"));
+        assertNull(cleaner.cleanSignalType("TBD"));
+        assertNull(cleaner.cleanSignalType("-"));
+        assertNull(cleaner.cleanSignalType("NaN"));
+    }
 }

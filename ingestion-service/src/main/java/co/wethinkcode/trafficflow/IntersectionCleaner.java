@@ -60,8 +60,17 @@ public class IntersectionCleaner {
 
     // Reuse one rule for values that should be treated as missing.
     private boolean isMissingValue(String value) {
-        return value == null
-                || value.trim().isEmpty()
-                || value.trim().equalsIgnoreCase("unknown");
+        if (value == null) {
+            return true;
+        }
+
+        String cleaned = value.trim();
+
+        return cleaned.isEmpty()
+                || cleaned.equalsIgnoreCase("unknown")
+                || cleaned.equalsIgnoreCase("n/a")
+                || cleaned.equalsIgnoreCase("tbd")
+                || cleaned.equals("-")
+                || cleaned.equalsIgnoreCase("nan");
     }
 }
