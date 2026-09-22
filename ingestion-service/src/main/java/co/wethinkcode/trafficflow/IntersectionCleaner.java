@@ -11,7 +11,9 @@ public class IntersectionCleaner {
     }
 
     public String cleanDistrict(String district) {
-        if (district == null || district.trim().isEmpty()) {
+
+        // Treat blank or placeholder district values as missing data.
+        if (isMissingValue(district)) {
             return null;
         }
 
@@ -21,21 +23,19 @@ public class IntersectionCleaner {
     }
 
     public String cleanSignalType(String signalType) {
-        if (signalType == null || signalType.trim().isEmpty()) {
+
+        // Treat blank or "unknown" signal types as missing data.
+        if (isMissingValue(signalType)) {
             return null;
         }
 
-        String cleaned = signalType.trim().toLowerCase();
-
-        if (cleaned.equals("unknown")) {
-            return null;
-        }
-
-        return cleaned;
+        return signalType.trim().toLowerCase();
     }
 
     public Boolean cleanActiveFlag(String activeFlag) {
-        if (activeFlag == null || activeFlag.trim().isEmpty()) {
+
+        // Treat blank or "unknown" active flags as missing data.
+        if (isMissingValue(activeFlag)) {
             return null;
         }
 
@@ -56,5 +56,12 @@ public class IntersectionCleaner {
         }
 
         return null;
+    }
+
+    // Reuse one rule for values that should be treated as missing.
+    private boolean isMissingValue(String value) {
+        return value == null
+                || value.trim().isEmpty()
+                || value.trim().equalsIgnoreCase("unknown");
     }
 }

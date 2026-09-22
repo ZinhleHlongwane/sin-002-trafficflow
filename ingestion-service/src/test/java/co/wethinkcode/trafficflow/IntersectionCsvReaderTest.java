@@ -44,4 +44,36 @@ public class IntersectionCsvReaderTest {
 
         assertEquals(1, count);
     }
+
+    @Test
+    void shouldHandleMissingAndUnknownValues() {
+        IntersectionCsvReader reader = new IntersectionCsvReader();
+
+        List<Intersection> intersections = reader.readIntersections();
+
+        // INT-1007 has a blank signal type in the CSV.
+        Intersection missingSignal = intersections.stream()
+                .filter(intersection -> intersection.getId().equals("INT-1007"))
+                .findFirst()
+                .orElseThrow();
+
+        // INT-1013 uses "unknown" for both signal type and active flag.
+        Intersection unknownValues = intersections.stream()
+                .filter(intersection -> intersection.getId().equals("INT-1013"))
+                .findFirst()
+                .orElseThrow();
+
+        // INT-1015 has a blank district in the CSV.
+        Intersection missingDistrict = intersections.stream()
+                .filter(intersection -> intersection.getId().equals("INT-1015"))
+                .findFirst()
+                .orElseThrow();
+
+        assertNull(missingSignal.getSignalType());
+
+        assertNull(unknownValues.getSignalType());
+        assertNull(unknownValues.getActive());
+
+        assertNull(missingDistrict.getDistrict());
+    }
 }
