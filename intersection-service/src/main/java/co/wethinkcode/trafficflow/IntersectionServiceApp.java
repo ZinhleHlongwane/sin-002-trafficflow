@@ -7,7 +7,28 @@ public class IntersectionServiceApp {
     public static void main(String[] args) {
         Javalin app = Javalin.create().start(7021);
 
+        // Connects this service to the cleaned intersection data from ingestion-service
+        IngestionClient ingestionClient = new IngestionClient();
+
         app.get("/health", ctx -> ctx.result("OK"));
+
+        // Look up a specific intersection by ID.
+        app.get("/intersections/{id}", ctx -> {
+            String requestedId = ctx.pathParam("id").trim().toUpperCase();
+
+            Intersection intersection = ingestionClient.getIntersections()
+                    .stream()
+                    .filter(item -> item.getId().equals(requestedId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (intersection == null) {
+                ctx.status(404).result("Intersection not found");
+                return;
+            }
+
+            ctx.json(intersection);
+        });
 
         // TODO (Validates intersection/district names (source of truth).)
         // Add domain endpoints for intersection-service here.
