@@ -17,14 +17,32 @@ public class RoutingServiceApp {
 
         // Estimate travel time using a valid intersection and current congestion level.
         app.get("/route/{intersectionId}", ctx -> {
-            String intersectionId = ctx.pathParam("intersectionId").trim().toUpperCase();
+            String intersectionId =
+                    ctx.pathParam("intersectionId").trim().toUpperCase();
 
-            if (!intersectionClient.intersectionExists(intersectionId)) {
+            boolean intersectionExists;
+
+            try {
+                intersectionExists =
+                        intersectionClient.intersectionExists(intersectionId);
+            } catch (RuntimeException e) {
+                ctx.status(503).result("Intersection service unavailable");
+                return;
+            }
+
+            if (!intersectionExists) {
                 ctx.status(404).result("Intersection not found");
                 return;
             }
 
-            int congestionLevel = congestionClient.getCongestionLevel();
+            int congestionLevel;
+
+            try {
+                congestionLevel = congestionClient.getCongestionLevel();
+            } catch (RuntimeException e) {
+                ctx.status(503).result("Congestion service unavailable");
+                return;
+            }
 
             int baseTravelTime = 10;
             int estimatedTravelTime =
