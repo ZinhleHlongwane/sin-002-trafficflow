@@ -10,6 +10,24 @@ public class IntersectionServiceApp {
         // Connects this service to the cleaned intersection data from ingestion-service
         IngestionClient ingestionClient = new IngestionClient();
 
+        HeartbeatPublisher heartbeatPublisher = new HeartbeatPublisher();
+
+        Thread heartbeatThread = new Thread(() -> {
+            while (true) {
+                heartbeatPublisher.publish();
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+
+        heartbeatThread.setDaemon(true);
+        heartbeatThread.start();
+
         app.get("/health", ctx -> ctx.result("OK"));
 
         // Look up a specific intersection by ID.
