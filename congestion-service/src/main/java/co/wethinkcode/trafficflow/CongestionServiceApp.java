@@ -10,6 +10,8 @@ public class CongestionServiceApp {
         // Stores the current city-wide congestion level in memory.
         int[] congestionLevel = {0};
 
+        CongestionPublisher congestionPublisher = new CongestionPublisher();
+
         app.get("/health", ctx -> ctx.result("OK"));
 
         // TODO (Tracks the city-wide Congestion Level (0-8).)
@@ -20,7 +22,7 @@ public class CongestionServiceApp {
             ctx.json(congestionLevel[0]);
         });
 
-        // Update the congestion level, allowing only values from 0 to 8.
+        // Update the congestion level and publish the change to ActiveMQ.
         app.put("/congestion/{level}", ctx -> {
             int level;
 
@@ -37,6 +39,8 @@ public class CongestionServiceApp {
             }
 
             congestionLevel[0] = level;
+            congestionPublisher.publish(level);
+
             ctx.result("Congestion level updated to " + level);
         });
     }
