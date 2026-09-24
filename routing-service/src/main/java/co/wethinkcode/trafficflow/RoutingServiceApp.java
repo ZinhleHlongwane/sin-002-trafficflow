@@ -8,7 +8,9 @@ public class RoutingServiceApp {
         Javalin app = Javalin.create().start(7023);
 
         IntersectionClient intersectionClient = new IntersectionClient();
-        CongestionClient congestionClient = new CongestionClient();
+
+        CongestionSubscriber congestionSubscriber = new CongestionSubscriber();
+        congestionSubscriber.start();
 
         app.get("/health", ctx -> ctx.result("OK"));
 
@@ -35,14 +37,8 @@ public class RoutingServiceApp {
                 return;
             }
 
-            int congestionLevel;
-
-            try {
-                congestionLevel = congestionClient.getCongestionLevel();
-            } catch (RuntimeException e) {
-                ctx.status(503).result("Congestion service unavailable");
-                return;
-            }
+            int congestionLevel =
+                    congestionSubscriber.getLatestCongestionLevel();
 
             int baseTravelTime = 10;
             int estimatedTravelTime =
