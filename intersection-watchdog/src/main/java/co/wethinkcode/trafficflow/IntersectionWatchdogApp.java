@@ -11,6 +11,30 @@ public class IntersectionWatchdogApp {
 
         // TODO (Cries for help if the Intersection Service crashes, since routes can no longer be validated.)
         // Mechanism: ActiveMQ Queue heartbeat/dead-letter
+
+        HeartbeatConsumer heartbeatConsumer = new HeartbeatConsumer();
+        heartbeatConsumer.start();
+
+        Thread watchdogThread = new Thread(() -> {
+            while (true) {
+                long timeSinceLastHeartbeat =
+                        System.currentTimeMillis() - heartbeatConsumer.getLastHeartbeatTime();
+
+                if (timeSinceLastHeartbeat > 15000) {
+                    System.out.println("ALERT: Intersection service heartbeat missed");
+                }
+
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+
+        watchdogThread.setDaemon(true);
+        watchdogThread.start();
     }
 }
 
