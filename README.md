@@ -162,6 +162,10 @@ then add tests under that module's `src/test/java/...` and run:
 ```
 mvn test
 ```
+## Demo Video
+
+[Watch the TrafficFlow Systems Integration Demo on YouTube](https://youtu.be/MFMZNNQzxu4)
+```
 
 ## WeThinkCode_ Verification
 
